@@ -21,6 +21,21 @@ export class TokenService {
     private readonly txOutRepository: Repository<TxOutEntity>,
   ) {}
 
+  async getTokenInfos(offset: number, limit: number) {
+    const [infos, total] = await this.tokenInfoRepository.findAndCount({
+      skip: offset || Constants.QUERY_PAGING_DEFAULT_OFFSET,
+      take: Math.min(
+        limit || Constants.QUERY_PAGING_DEFAULT_LIMIT,
+        Constants.QUERY_PAGING_MAX_LIMIT,
+      ),
+    });
+
+    return {
+      total,
+      tokens: infos.map((info) => this.renderTokenInfo(info)),
+    };
+  }
+
   async getTokenInfoByTokenIdOrTokenAddress(tokenIdOrTokenAddr: string) {
     let where;
     if (tokenIdOrTokenAddr.includes('_')) {
