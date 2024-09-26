@@ -7,6 +7,33 @@ import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 export class TokenController {
   constructor(private readonly tokenService: TokenService) {}
 
+  @Get()
+  @ApiTags('token')
+  @ApiOperation({ summary: 'Get all tokens' })
+  @ApiQuery({
+    name: 'offset',
+    required: false,
+    type: Number,
+    description: 'paging offset',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'paging limit',
+  })
+  async getTokenInfos(
+    @Query('offset') offset: number,
+    @Query('limit') limit: number,
+  ) {
+    try {
+      const data = await this.tokenService.getTokenInfos(offset, limit);
+      return okResponse(data);
+    } catch (e) {
+      return errorResponse(e);
+    }
+  }
+
   @Get(':tokenIdOrTokenAddr')
   @ApiTags('token')
   @ApiOperation({ summary: 'Get token info by token id or token address' })
